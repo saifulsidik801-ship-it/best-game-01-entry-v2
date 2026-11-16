@@ -66,6 +66,67 @@ function drawBar(ctx, x, y, w, h, frac, fill, label, valueText) {
   ctx.fillText(valueText, x + w, y - 7);
 }
 
+function roundRectPath(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y, x + w, y + r, r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.lineTo(x, y + r);
+  ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
+}
+
+function drawSparkle(ctx, cx, cy, r, color) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  const inner = r * 0.26;
+  for (let i = 0; i < 8; i++) {
+    const ang = -Math.PI / 2 + (i * Math.PI) / 4;
+    const rad = i % 2 === 0 ? r : inner;
+    const px = cx + Math.cos(ang) * rad;
+    const py = cy + Math.sin(ang) * rad;
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+  ctx.fill();
+}
+
+// The make.fun mark, in the style of the site's own header: a gold sparkle
+// in a dark rounded square, then the "make.fun" wordmark.
+function drawMakefunBadge(ctx, rightX, topY, scale) {
+  const h = 34 * scale;
+  ctx.save();
+  ctx.font = `bold ${Math.round(17 * scale)}px system-ui, sans-serif`;
+  const textW = ctx.measureText('make.fun').width;
+  const pad = 10 * scale;
+  const icon = 22 * scale;
+  const gap = 8 * scale;
+  const w = pad + icon + gap + textW + pad;
+  const x = rightX - w;
+  ctx.fillStyle = 'rgba(9, 13, 34, 0.85)';
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.16)';
+  ctx.lineWidth = 1;
+  roundRectPath(ctx, x, topY, w, h, 9 * scale);
+  ctx.fill();
+  ctx.stroke();
+  const ix = x + pad;
+  const iy = topY + (h - icon) / 2;
+  ctx.fillStyle = '#141a3d';
+  roundRectPath(ctx, ix, iy, icon, icon, 6 * scale);
+  ctx.fill();
+  drawSparkle(ctx, ix + icon / 2, iy + icon / 2, icon * 0.42, '#ffd166');
+  ctx.fillStyle = '#f4f6ff';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('make.fun', ix + icon + gap, topY + h / 2 + 0.5 * scale);
+  ctx.restore();
+}
+
 function drawHud(ctx, world) {
   // Top-left: Heartflame + Pulse charge.
   drawBar(ctx, 28, 52, 230, 14, world.hp / world.maxHp, '#ff8c42', 'HEARTFLAME', `${Math.ceil(world.hp)} / ${world.maxHp}`);
@@ -125,6 +186,8 @@ function drawHud(ctx, world) {
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, W, H);
   }
+  // make.fun mark, bottom-right: small, subtle, clear of the hint line.
+  drawMakefunBadge(ctx, W - 24, H - 52, 0.8);
 }
 
 function drawLegendRow(ctx, y) {
@@ -154,6 +217,8 @@ function drawLegendRow(ctx, y) {
 function drawTitle(ctx, world, t) {
   ctx.fillStyle = 'rgba(5, 6, 15, 0.55)';
   ctx.fillRect(0, 0, W, H);
+  // make.fun mark, top-right corner of the title screen.
+  drawMakefunBadge(ctx, W - 28, 28, 1);
   ctx.textAlign = 'center';
   // Logo with a prismatic gradient.
   const grad = ctx.createLinearGradient(CX - 260, 0, CX + 260, 0);

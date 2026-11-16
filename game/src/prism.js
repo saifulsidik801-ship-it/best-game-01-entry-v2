@@ -140,5 +140,21 @@ export function drawPrism(ctx, prism, world, t) {
     ctx.lineWidth = 1;
     ctx.stroke();
   }
+  // A tiny face on the crystal: the little guardian spins with the aim.
+  ctx.fillStyle = '#12303f';
+  ctx.beginPath();
+  ctx.arc(-7, -4, 2.6, 0, Math.PI * 2);
+  ctx.arc(7, -4, 2.6, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.arc(-6.2, -4.8, 0.9, 0, Math.PI * 2);
+  ctx.arc(7.8, -4.8, 0.9, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#12303f';
+  ctx.lineWidth = 1.4;
+  ctx.beginPath();
+  ctx.arc(0, 4, 5, Math.PI * 0.2, Math.PI * 0.8);
+  ctx.stroke();
   ctx.restore();
 }
